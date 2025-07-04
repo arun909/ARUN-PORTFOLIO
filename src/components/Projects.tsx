@@ -51,9 +51,7 @@ const Projects: React.FC<ProjectsProps> = ({ isDarkMode }) => {
       description: "A modern, secure, and responsive one-to-one messaging platform built with React and Firebase. Asquare offers seamless private conversations with real-time updates, intuitive UI, and cross-device accessibility, ensuring a smooth and secure communication experience.",
       image: "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=800",
       screenshots: [
-        "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=1200",
-        "https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=1200",
-        "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=1200"
+        
       ],
       tech: ["React", "Javascript", "Css", "Firebase"],
       github: "https://github.com/arun909/asquare",
@@ -67,9 +65,7 @@ const Projects: React.FC<ProjectsProps> = ({ isDarkMode }) => {
       description: "A sleek and lightweight personal finance tracking app designed to help users monitor income, control spending, and visualize budgets effortlessly. Expenso combines an intuitive interface with powerful features like emoji-based tagging and interactive charts to make managing finances both engaging and effective.",
       image: "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=800",
       screenshots: [
-        "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=1200",
-        "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1200",
-        "https://images.pexels.com/photos/177598/pexels-photo-177598.jpeg?auto=compress&cs=tinysrgb&w=1200"
+       
       ],
       tech: ["Chart.js", "React", "Firebase", "Javascript", "Css"],
       github: "https://github.com/arun909/money",
