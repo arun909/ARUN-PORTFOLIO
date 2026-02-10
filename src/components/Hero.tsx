@@ -8,24 +8,49 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ isDarkMode }) => {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const fullText = "Full stack developer";
 
-  // Profile image URL - replace with your actual image
-  const profileImageUrl = "/ss/photo.jpeg";
+  const roles = [
+    "Full Stack Developer",
+    "Systems Engineer",
+    "Problem Solver"
+  ];
 
+  // Typewriter effect logic
   useEffect(() => {
-    if (currentIndex < fullText.length) {
-      const timeout = setTimeout(() => {
-        setDisplayText(prev => prev + fullText[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, fullText]);
+    const currentRole = roles[roleIndex];
 
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        // Typing
+        if (currentIndex < currentRole.length) {
+          setDisplayText(prev => prev + currentRole[currentIndex]);
+          setCurrentIndex(prev => prev + 1);
+        } else {
+          // Finished typing, wait before deleting
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        // Deleting
+        if (currentIndex > 0) {
+          setDisplayText(prev => prev.slice(0, -1));
+          setCurrentIndex(prev => prev - 1);
+        } else {
+          // Finished deleting, move to next role
+          setIsDeleting(false);
+          setRoleIndex(prev => (prev + 1) % roles.length);
+        }
+      }
+    }, isDeleting ? 50 : 100);
+
+    return () => clearTimeout(timeout);
+  }, [currentIndex, isDeleting, roleIndex, roles]);
+
+  // Cursor blinking effect
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor(prev => !prev);
@@ -33,47 +58,8 @@ const Hero: React.FC<HeroProps> = ({ isDarkMode }) => {
     return () => clearInterval(cursorInterval);
   }, []);
 
-  // Generate GitHub-style contribution data
-  const generateContributionData = () => {
-    const weeks = 52;
-    const daysPerWeek = 7;
-    const data = [];
-    
-    for (let week = 0; week < weeks; week++) {
-      const weekData = [];
-      for (let day = 0; day < daysPerWeek; day++) {
-        // Generate random contribution levels (0-4)
-        const level = Math.floor(Math.random() * 5);
-        weekData.push(level);
-      }
-      data.push(weekData);
-    }
-    return data;
-  };
-
-  const contributionData = generateContributionData();
-
-  const getContributionColor = (level: number) => {
-    if (isDarkMode) {
-      switch (level) {
-        case 0: return 'bg-gray-800/50';
-        case 1: return 'bg-green-400/20';
-        case 2: return 'bg-green-400/40';
-        case 3: return 'bg-green-400/60';
-        case 4: return 'bg-green-400/80';
-        default: return 'bg-gray-800/50';
-      }
-    } else {
-      switch (level) {
-        case 0: return 'bg-blue-100';
-        case 1: return 'bg-blue-300/60';
-        case 2: return 'bg-blue-500/70';
-        case 3: return 'bg-blue-600/80';
-        case 4: return 'bg-blue-700';
-        default: return 'bg-blue-100';
-      }
-    }
-  };
+  // Profile image URL - replace with your actual image
+  const profileImageUrl = "/ss/photo.jpeg";
 
   const handleImageLoad = () => {
     setTimeout(() => {
@@ -86,59 +72,46 @@ const Hero: React.FC<HeroProps> = ({ isDarkMode }) => {
   };
 
   return (
-    <section id="home" className={`min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden ${
-      isDarkMode 
-        ? 'bg-gradient-to-br from-black via-gray-900 to-black' 
+    <section id="home" className={`min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-700 ${isDarkMode
+        ? 'bg-gradient-to-br from-black via-gray-900 to-black'
         : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
-    }`}>
-      {/* GitHub Contribution Graph Background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-15">
-        <div className="grid grid-cols-52 gap-1 max-w-6xl mx-auto">
-          {contributionData.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-1">
-              {week.map((level, dayIndex) => (
-                <div
-                  key={`${weekIndex}-${dayIndex}`}
-                  className={`w-2 h-2 rounded-sm ${getContributionColor(level)} transition-all duration-300`}
-                  style={{
-                    animationDelay: `${(weekIndex * 7 + dayIndex) * 10}ms`,
-                  }}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+      }`}>
+
+      {/* Background Shapes (Subtle Animation) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-1/4 left-1/4 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob ${isDarkMode ? 'bg-green-500' : 'bg-blue-300'
+          }`}></div>
+        <div className={`absolute top-1/3 right-1/4 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 ${isDarkMode ? 'bg-blue-500' : 'bg-purple-300'
+          }`}></div>
+        <div className={`absolute bottom-1/4 left-1/3 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 ${isDarkMode ? 'bg-purple-500' : 'bg-pink-300'
+          }`}></div>
       </div>
 
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* Profile Image Section */}
         <div className="mb-12 flex justify-center">
-          <div className="relative">
+          <div className="relative group">
             {/* Profile Image Container */}
-            <div className={`relative w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden border-4 transition-all duration-700 ${
-              isDarkMode 
-                ? 'border-green-400/30 shadow-2xl shadow-green-400/20' 
+            <div className={`relative w-40 h-40 sm:w-48 sm:h-48 rounded-full overflow-hidden border-4 transition-all duration-700 ${isDarkMode
+                ? 'border-green-400/30 shadow-2xl shadow-green-400/20'
                 : 'border-blue-300 shadow-2xl shadow-blue-200'
-            }`}>
+              } group-hover:scale-105`}>
+
               {/* Loading Spinner */}
               {!imageLoaded && !imageError && (
-                <div className={`absolute inset-0 flex items-center justify-center ${
-                  isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-                }`}>
-                  <div className={`w-12 h-12 border-4 border-t-transparent rounded-full animate-spin ${
-                    isDarkMode ? 'border-green-400' : 'border-blue-600'
-                  }`}></div>
+                <div className={`absolute inset-0 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                  }`}>
+                  <div className={`w-12 h-12 border-4 border-t-transparent rounded-full animate-spin ${isDarkMode ? 'border-green-400' : 'border-blue-600'
+                    }`}></div>
                 </div>
               )}
 
               {/* Fallback Icon */}
               {imageError && (
-                <div className={`absolute inset-0 flex items-center justify-center ${
-                  isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-                }`}>
-                  <User className={`w-20 h-20 ${
-                    isDarkMode ? 'text-green-400' : 'text-blue-600'
-                  }`} />
+                <div className={`absolute inset-0 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                  }`}>
+                  <User className={`w-20 h-20 ${isDarkMode ? 'text-green-400' : 'text-blue-600'
+                    }`} />
                 </div>
               )}
 
@@ -146,101 +119,65 @@ const Hero: React.FC<HeroProps> = ({ isDarkMode }) => {
               <img
                 src={profileImageUrl}
                 alt="Arun Babu"
-                className={`w-full h-full object-cover transition-all duration-700 ${
-                  imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-                }`}
+                className={`w-full h-full object-cover transition-all duration-700 ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+                  }`}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
               />
-
-              {/* Animated Border Ring */}
-              <div className={`absolute -inset-2 rounded-full transition-all duration-700 ${
-                imageLoaded 
-                  ? isDarkMode 
-                    ? 'bg-gradient-to-r from-green-400 via-green-300 to-green-400 animate-spin opacity-60' 
-                    : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 animate-spin opacity-60'
-                  : 'opacity-0'
-              } -z-10 blur-sm`} style={{ animationDuration: '4s' }}></div>
             </div>
 
             {/* Status Indicator */}
-            <div className={`absolute bottom-2 right-2 w-10 h-10 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${
-              isDarkMode 
-                ? 'bg-green-400 border-black' 
+            <div className={`absolute bottom-2 right-2 w-10 h-10 rounded-full border-4 flex items-center justify-center transition-all duration-500 ${isDarkMode
+                ? 'bg-green-400 border-black'
                 : 'bg-green-500 border-white shadow-lg'
-            } ${imageLoaded ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
-              <div className={`w-3 h-3 rounded-full ${
-                isDarkMode ? 'bg-black' : 'bg-white'
-              } animate-pulse`}></div>
+              } ${imageLoaded ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+              <div className={`w-3 h-3 rounded-full ${isDarkMode ? 'bg-black' : 'bg-white'
+                } animate-pulse`}></div>
             </div>
           </div>
         </div>
 
-        <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 font-mono transition-all duration-700 ${
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        } ${imageLoaded ? 'transform translate-y-0 opacity-100' : 'transform translate-y-4 opacity-80'}`}>
+        <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 font-mono transition-all duration-700 transform ${isDarkMode ? 'text-white' : 'text-gray-900'
+          } ${imageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <span>Hi, I'm </span>
-          <span className={isDarkMode ? 'text-green-400' : 'text-blue-600'}>
+          <span className={`inline-block transition-colors duration-300 ${isDarkMode ? 'text-green-400' : 'text-blue-600'}`}>
             Arun Babu
           </span>
         </h1>
 
-        <div className={`text-2xl sm:text-3xl lg:text-4xl font-light mb-8 h-12 flex items-center justify-center font-mono transition-all duration-700 ${
-          isDarkMode ? 'text-green-300' : 'text-indigo-600'
-        } ${imageLoaded ? 'transform translate-y-0 opacity-100' : 'transform translate-y-4 opacity-80'}`}>
+        <div className={`text-2xl sm:text-3xl lg:text-4xl font-light mb-8 h-12 flex items-center justify-center font-mono transition-all duration-700 delay-100 transform ${isDarkMode ? 'text-green-300' : 'text-indigo-600'
+          } ${imageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <span>
             {displayText}
-            <span className={`ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'} ${
-              isDarkMode ? 'text-green-400' : 'text-blue-500'
-            }`}>
+            <span className={`ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'} ${isDarkMode ? 'text-green-400' : 'text-blue-500'
+              }`}>
               |
             </span>
           </span>
         </div>
 
-        <p className={`text-lg sm:text-xl max-w-3xl mx-auto mb-12 leading-relaxed font-mono transition-all duration-700 ${
-          isDarkMode ? 'text-gray-300' : 'text-gray-700'
-        } ${imageLoaded ? 'transform translate-y-0 opacity-100' : 'transform translate-y-4 opacity-80'}`}>
-            B.Tech graduate passionate about creating web-based solutions for real-world problems and exploring innovative ideas that can be turned into reality.
+        <p className={`text-lg sm:text-xl max-w-3xl mx-auto mb-12 leading-relaxed font-mono transition-all duration-700 delay-200 transform ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
+          } ${imageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          B.Tech graduate passionate about creating web-based solutions for real-world problems and exploring innovative ideas that can be turned into reality.
         </p>
 
-        {/* GitHub-style Activity Summary */}
-        <div className={`inline-flex items-center space-x-4 mb-8 px-4 py-2 rounded-lg border font-mono text-sm transition-all duration-700 ${
-          isDarkMode 
-            ? 'bg-black/50 border-green-400/20 text-gray-400' 
-            : 'bg-white/80 border-blue-200 text-blue-700 shadow-sm'
-        } ${imageLoaded ? 'transform translate-y-0 opacity-100' : 'transform translate-y-4 opacity-80'}`}>
-          <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-sm ${isDarkMode ? 'bg-green-400' : 'bg-blue-600'}`}></div>
-            <span>Active Developer</span>
-          </div>
-          <div className={`w-px h-4 ${isDarkMode ? 'bg-gray-400' : 'bg-blue-300'}`}></div>
-          <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-sm ${isDarkMode ? 'bg-green-400/60' : 'bg-indigo-500'}`}></div>
-            <span>Troubleshooter</span>
-          </div>
-        </div>
-
-        <div className={`flex flex-col sm:flex-row gap-6 justify-center items-center transition-all duration-700 ${
-          imageLoaded ? 'transform translate-y-0 opacity-100' : 'transform translate-y-4 opacity-80'
-        }`}>
-          <button 
+        <div className={`flex flex-col sm:flex-row gap-6 justify-center items-center transition-all duration-700 delay-300 transform ${imageLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`}>
+          <button
             onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-            className={`group px-8 py-4 font-semibold rounded-lg transition-all duration-300 flex items-center space-x-2 font-mono ${
-              isDarkMode 
-                ? 'bg-green-400 text-black hover:bg-green-300' 
-                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl'
-            }`}
+            className={`group px-8 py-4 font-semibold rounded-lg transition-all duration-300 flex items-center space-x-2 font-mono ${isDarkMode
+                ? 'bg-green-400 text-black hover:bg-green-300 hover:shadow-lg hover:shadow-green-400/20'
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg hover:shadow-xl hover:shadow-blue-600/20'
+              }`}
           >
             <span>View My Work</span>
             <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
 
-          <button className={`group px-8 py-4 border-2 font-semibold rounded-lg transition-all duration-300 flex items-center space-x-2 font-mono ${
-            isDarkMode 
-              ? 'border-green-400 text-green-400 hover:bg-green-400/10' 
+          <button className={`group px-8 py-4 border-2 font-semibold rounded-lg transition-all duration-300 flex items-center space-x-2 font-mono ${isDarkMode
+              ? 'border-green-400 text-green-400 hover:bg-green-400/10'
               : 'border-blue-600 text-blue-600 hover:bg-blue-50 shadow-md hover:shadow-lg'
-          }`}>
+            }`}>
             <Download className="h-5 w-5" />
             <span>Download Resume</span>
           </button>
